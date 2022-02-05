@@ -20,6 +20,8 @@ pip install sklearn
 $ python --version
 Python 3.6.8
 
-$ python cas12a_cap_guide_scorer.py --seq TGTCTTTGGAGAGGCCCAACTGCAAGGTTGACCC --feature 100_selected_feats.txt --training JS_feature_table.csv
-[2.79089647]
+$ python cas12a_cap_guide_scorer.py --seq example_input_seqs.txt --feature 100_selected_feats.txt --training JS_feature_table.csv
+TGTCTTTGGAGAGGCCCAACTGCAAGGTTGACCC 	 [2.79089647]
+ATTATTTAATAAAATAAAAGATTAAGTCAACTAC 	 [2.11414485]
+CCTCTTTAACTTCAGGACAGATTCGCAGCCTCCC 	 [2.49253451]
 ```

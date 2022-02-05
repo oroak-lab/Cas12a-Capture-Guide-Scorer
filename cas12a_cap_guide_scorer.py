@@ -58,7 +58,7 @@ def main():
 
     p.add_argument('-s', '--seq', action='store', required=True, 
         type=str, metavar='ACGT',
-        help='input sequence, i.e. TGTCTTTGGAGAGGCCCAACTGCAAGGTTGACCC')
+        help='list of input sequences, one per line')
 
     p.add_argument('-f', '--features', action='store', required=True, 
         type=str, metavar='feature_file',
@@ -70,34 +70,44 @@ def main():
 
     args = p.parse_args()
 
-    # select feature
-    query_df = gen_feats(args.seq)
+    # read sequences
+    seqs = []
+    with open (args.seq) as sequences:
+       for line in sequences:
+           ls = line.strip()
+           seqs.append(ls)
 
-    selected_feats = []
-    with open (args.features) as data:
-        for line in data:
-            ls = line.strip()
-            selected_feats.append(ls)
+    # for each sequence
+    for seq in seqs:
 
-    query_df_selected_feats = query_df[selected_feats]
+        # select feature
+        query_df = gen_feats(seq)
 
-    # get training data
-    df = pd.read_csv(args.training, index_col = 0)
+        selected_feats = []
+        with open (args.features) as data:
+            for line in data:
+                ls = line.strip()
+                selected_feats.append(ls)
 
-    # add a pseudocount to all guides so that we can still take log:
-    df['sum'] = df['sum']+1
+        query_df_selected_feats = query_df[selected_feats]
 
-    # calculate log sum:
-    df['log_sum'] = np.log10(df['sum'])
+        # get training data
+        df = pd.read_csv(args.training, index_col = 0)
 
-    # train the model
-    X_train = df[selected_feats].copy()
-    y_train = df['log_sum']
-    regr = LinearRegression().fit(X_train, y_train)
+        # add a pseudocount to all guides so that we can still take log:
+        df['sum'] = df['sum']+1
 
-    # make predictions
-    preds = regr.predict(query_df_selected_feats)
-    print(preds)
+        # calculate log sum:
+        df['log_sum'] = np.log10(df['sum'])
+
+        # train the model
+        X_train = df[selected_feats].copy()
+        y_train = df['log_sum']
+        regr = LinearRegression().fit(X_train, y_train)
+
+        # make predictions
+        preds = regr.predict(query_df_selected_feats)
+        print(seq,"\t",preds)
 
 if __name__=='__main__':
   main()
